@@ -1,0 +1,31 @@
+{
+  "name": "rd-fitz-my-gym-copilot",
+  "version": "0.3.0",
+  "private": true,
+  "main": "index.js",
+  "description": "RD FITZ My Gym Copilot iPhone first Expo app scaffold",
+  "scripts": {
+    "start": "expo start",
+    "ios": "expo run:ios",
+    "android": "expo run:android",
+    "web": "expo start --web",
+    "test": "node --test tests/*.test.mjs",
+    "check": "node --test tests/*.test.mjs",
+    "bootstrap:offline": "node scripts/bootstrap-offline.mjs",
+    "install:expo:template": "node scripts/write-expo-package.mjs",
+    "release:artifact": "node scripts/create-release-artifact.mjs",
+    "release:github": "node scripts/publish-github-release.mjs"
+  },
+  "dependencies": {
+    "expo": "~52.0.0",
+    "expo-av": "~15.0.1",
+    "expo-haptics": "~14.0.1",
+    "expo-notifications": "~0.29.8",
+    "react": "18.3.1",
+    "react-native": "0.76.3"
+  },
+  "devDependencies": {
+    "typescript": "~5.7.2",
+    "@types/react": "~18.3.12"
+  }
+}
