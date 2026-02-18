@@ -1,0 +1,22 @@
+{
+  "expo": {
+    "name": "RD FITZ",
+    "slug": "rd-fitz-my-gym-copilot",
+    "version": "0.2.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "backgroundColor": "#F5F5F5"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.rdfitz.copilot"
+    },
+    "android": {
+      "package": "com.rdfitz.copilot"
+    },
+    "plugins": [
+      "expo-notifications"
+    ]
+  }
+}

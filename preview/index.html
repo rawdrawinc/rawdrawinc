@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RD FITZ Preview</title>
+  <style>
+    body { margin: 0; font-family: Inter, system-ui, sans-serif; background: #F5F5F5; color: #111111; }
+    .phone { width: 390px; margin: 20px auto; background: #F5F5F5; padding: 16px; }
+    .title { font-size: 32px; font-weight: 800; }
+    .subtitle { color: #4B4B4B; margin-bottom: 12px; }
+    .tabs { display: flex; background: #fff; border-radius: 16px; padding: 6px; gap: 6px; }
+    .tab { flex: 1; text-align: center; padding: 10px 0; border-radius: 12px; color: #4B4B4B; font-weight: 600; }
+    .tab.active { background: #00C853; color: #fff; }
+    .card { background: #fff; border-radius: 14px; padding: 14px; margin-top: 10px; display:flex; justify-content:space-between; align-items:center; }
+    .day { font-size: 13px; color: #4B4B4B; font-weight: 700; }
+    .name { font-size: 18px; font-weight: 700; }
+    .meta { font-size: 13px; color: #4B4B4B; }
+    .btn { background: #00C853; color: #fff; border-radius: 10px; padding: 8px 12px; font-weight: 700; }
+    .streak { margin-top: 12px; background:#E8F8EE; border-radius: 14px; padding: 14px; }
+    .streak h4 { margin: 0; color:#156C3A; }
+    .streak p { margin: 4px 0 0; font-size: 24px; font-weight: 800; color:#0F4125; }
+  </style>
+</head>
+<body>
+  <div class="phone">
+    <div class="title">RD FITZ</div>
+    <div class="subtitle">My Gym Copilot</div>
+    <div class="tabs">
+      <div class="tab active">Planner</div>
+      <div class="tab">Workouts</div>
+      <div class="tab">Progress</div>
+    </div>
+    <div class="card"><div><div class="day">Mon</div><div class="name">Cardio</div><div class="meta">35 min  Medium</div></div><div class="btn">Start workout</div></div>
+    <div class="card"><div><div class="day">Tue</div><div class="name">Bodyweight strength</div><div class="meta">30 min  Medium</div></div><div class="btn">Start workout</div></div>
+    <div class="streak"><h4>Streak counter</h4><p>6 days</p></div>
+  </div>
+</body>
+</html>
