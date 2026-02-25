@@ -49,6 +49,9 @@ void BrainRegion::AddSynapse(const Synapse& synapse) {
   if (synapse.pre_index >= neurons_.size() || synapse.post_index >= neurons_.size()) {
     throw std::out_of_range("synapse index out of range");
   }
+  if (synapse.delay_ticks < 0) {
+    throw std::invalid_argument("synapse delay_ticks must be non-negative");
+  }
   synapses_.push_back(synapse);
 }
 
