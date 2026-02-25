@@ -12,14 +12,10 @@ DialogBrain::DialogBrain() {
   memory_.push_back({"who are you", "I am a digital brain simulation process.", 0});
 }
 
-std::string DialogBrain::Reply(const std::string& user_text) {
-  const std::string trimmed = Trim(user_text);
+std::string DialogBrain::Reply(const std::string& user_text, const std::string& cognitive_action) {
+  const std::string trimmed = Truncate(Trim(user_text), kMaxInputLength);
   if (trimmed.empty()) {
     return "Please share a message so I can learn from it.";
-  }
-
-  for (const std::string& token : Tokenize(trimmed)) {
-    ++token_frequency_[token];
   }
 
   if (const std::optional<std::size_t> match = FindBestMatchIndex(trimmed)) {
@@ -28,28 +24,34 @@ std::string DialogBrain::Reply(const std::string& user_text) {
     return learned.assistant;
   }
 
-  const std::string generated = GenerateComposedReply(trimmed);
-  memory_.push_back({trimmed, generated, 1});
-  return generated;
+  return GenerateComposedReply(cognitive_action);
 }
 
 bool DialogBrain::Teach(const std::string& instruction) {
+  const std::string bounded = Truncate(instruction, kMaxInputLength);
   const std::string marker = "=>";
-  const std::size_t split = instruction.find(marker);
+  const std::size_t split = bounded.find(marker);
   if (split == std::string::npos) {
     return false;
   }
 
-  const std::string user_text = Trim(instruction.substr(0, split));
-  const std::string assistant_text = Trim(instruction.substr(split + marker.size()));
+  const std::string user_text = Truncate(Trim(bounded.substr(0, split)), kMaxStoredUtteranceLength);
+  const std::string assistant_text = Truncate(Trim(bounded.substr(split + marker.size())), kMaxStoredResponseLength);
   if (user_text.empty() || assistant_text.empty()) {
     return false;
   }
 
-  memory_.push_back({user_text, assistant_text, 0});
-  for (const std::string& token : Tokenize(user_text)) {
-    ++token_frequency_[token];
+  for (DialogueExample& example : memory_) {
+    if (Trim(example.user) == user_text) {
+      example.assistant = assistant_text;
+      example.uses = 0;
+      BoundedUpdateTokenFrequency(Tokenize(user_text));
+      return true;
+    }
   }
+
+  BoundedAppendMemory({user_text, assistant_text, 0});
+  BoundedUpdateTokenFrequency(Tokenize(user_text));
   return true;
 }
 
@@ -117,36 +119,14 @@ std::optional<std::size_t> DialogBrain::FindBestMatchIndex(const std::string& us
   return best_index;
 }
 
-std::string DialogBrain::GenerateComposedReply(const std::string& user_text) const {
-  const std::vector<std::string> tokens = Tokenize(user_text);
-  std::ostringstream out;
-  out << "I heard:";
-
-  if (tokens.empty()) {
-    out << " (no words).";
-    return out.str();
+std::string DialogBrain::GenerateComposedReply(const std::string& cognitive_action) const {
+  if (cognitive_action == "focus") {
+    return "I am focusing on your message. Teach me with: teach: input => response";
   }
-
-  std::size_t count = 0;
-  for (const std::string& token : tokens) {
-    if (count >= 8) {
-      break;
-    }
-    out << ' ' << token;
-    ++count;
+  if (cognitive_action == "explore") {
+    return "I am exploring options. Teach me with: teach: input => response";
   }
-  out << ".";
-
-  auto best = std::max_element(token_frequency_.begin(), token_frequency_.end(), [](const auto& left, const auto& right) {
-    return left.second < right.second;
-  });
-
-  if (best != token_frequency_.end()) {
-    out << " Most frequent concept so far: " << best->first << ".";
-  }
-
-  out << " You can refine my answer with: teach: your text => desired response";
-  return out.str();
+  return "I am listening. Teach me with: teach: input => response";
 }
 
 std::string DialogBrain::Trim(const std::string& value) {
@@ -162,6 +142,34 @@ std::string DialogBrain::Trim(const std::string& value) {
   }).base();
 
   return std::string(first, last);
+}
+
+std::string DialogBrain::Truncate(const std::string& input, const std::size_t max_len) {
+  if (input.size() <= max_len) {
+    return input;
+  }
+  return input.substr(0, max_len);
+}
+
+void DialogBrain::BoundedUpdateTokenFrequency(const std::vector<std::string>& tokens) {
+  for (const std::string& token : tokens) {
+    if (token_frequency_.contains(token)) {
+      ++token_frequency_[token];
+      continue;
+    }
+
+    if (token_frequency_.size() >= kMaxTokenFrequencyEntries) {
+      continue;
+    }
+    token_frequency_[token] = 1;
+  }
+}
+
+void DialogBrain::BoundedAppendMemory(DialogueExample example) {
+  if (memory_.size() >= kMaxMemoryExamples) {
+    memory_.erase(memory_.begin());
+  }
+  memory_.push_back(std::move(example));
 }
 
 }  // namespace brain::communication

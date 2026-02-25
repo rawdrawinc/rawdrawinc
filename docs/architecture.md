@@ -3,8 +3,9 @@
 ## Layered flow
 
 ```text
-User Input -> DialogBrain -> (memory match or composed reply) -> Response Output
-                     \-> SimulationEngine Tick (background neural update)
+User Input -> text->sensory transform -> Agent/SimulationEngine -> cognitive action
+      \-> DialogBrain(recall or safe fallback) -> sanitized terminal output
+      \-> AuditTrail (teach events) -> audit.log.jsonl
 ```
 
 ## Modules
@@ -21,21 +22,24 @@ User Input -> DialogBrain -> (memory match or composed reply) -> Response Output
 ### Communication (`brain::communication`)
 
 - `DialogBrain`
-  - Stores dialogue examples (`user -> assistant`)
+  - Stores dialogue examples (`user -> assistant`) with bounded capacity
   - Finds closest prior user message via token-set overlap
-  - Returns learned answer when confidence threshold is met
-  - Supports explicit supervised learning through `Teach(...)`
+  - Only learns new mappings through explicit `Teach(...)`
+  - Returns deterministic fallback responses for unknown input
+- `AuditTrail`
+  - Records teach events with UTC timestamp, user id, action, and outcome
 
 ### App layer
 
 - CLI loop in `src/app/main.cpp`
   - Robust command handling (`/help`, `/memory`, `/quit`)
-  - No busy-wait loops
-  - Input validation for teaching format
+  - Bridges user text into sensory vectors and simulation stepping via `Agent`
+  - Sanitizes terminal output to mitigate control-sequence injection
+  - Catches exceptions and emits generic user-safe error messages
 
-## Why this addresses communication requirement
+## Security/compliance-focused design choices
 
-- You can directly converse with the program.
-- The program updates behavior using new dialogue examples.
-- Repeated communication increases retrievable memory patterns.
-- Direct corrections can be injected immediately and reused.
+- Input length limits and bounded memory/token maps mitigate memory-exhaustion risk.
+- Unknown prompts do not auto-persist, reducing memory pollution.
+- User text is not echoed in fallback responses.
+- Teach actions produce auditable records.

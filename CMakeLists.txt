@@ -30,6 +30,7 @@ add_library(brain_cognitive
 
 add_library(brain_communication
     src/communication/DialogBrain.cpp
+    src/communication/AuditTrail.cpp
 )
 
 target_include_directories(brain_communication PUBLIC include)
