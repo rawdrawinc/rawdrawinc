@@ -14,11 +14,21 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Configure
+      - name: Configure (Unix)
+        if: runner.os != 'Windows'
+        run: cmake -S . -B build -DDBS_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Release
+
+      - name: Configure (Windows)
+        if: runner.os == 'Windows'
         run: cmake -S . -B build -DDBS_BUILD_TESTS=ON
 
       - name: Build
         run: cmake --build build --config Release
 
-      - name: Test
+      - name: Test (Unix)
+        if: runner.os != 'Windows'
+        run: ctest --test-dir build --output-on-failure
+
+      - name: Test (Windows)
+        if: runner.os == 'Windows'
         run: ctest --test-dir build -C Release --output-on-failure

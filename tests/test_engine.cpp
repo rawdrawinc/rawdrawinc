@@ -32,6 +32,14 @@ int main() {
   const float updated_weight = sensory->Synapses().at(0).weight;
   assert(updated_weight > 0.5F);
 
+  bool threw_negative_delay = false;
+  try {
+    sensory->AddSynapse(Synapse{1, 2, 0.3F, -1});
+  } catch (...) {
+    threw_negative_delay = true;
+  }
+  assert(threw_negative_delay);
+
   bool threw_null = false;
   try {
     std::unique_ptr<BrainRegion> null_region;
