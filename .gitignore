@@ -7,3 +7,4 @@
 *.so
 *.a
 *.lib
+audit.log.jsonl

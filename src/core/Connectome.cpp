@@ -5,6 +5,10 @@
 namespace brain::core {
 
 std::size_t Connectome::AddRegion(std::unique_ptr<BrainRegion> region) {
+  if (!region) {
+    throw std::invalid_argument("region must not be null");
+  }
+
   const std::string name = region->Name();
   if (index_by_name_.contains(name)) {
     throw std::invalid_argument("Region already exists: " + name);

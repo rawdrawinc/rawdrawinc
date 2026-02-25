@@ -32,17 +32,28 @@ int main() {
   const float updated_weight = sensory->Synapses().at(0).weight;
   assert(updated_weight > 0.5F);
 
+  bool threw_null = false;
+  try {
+    std::unique_ptr<BrainRegion> null_region;
+    engine.MutableConnectome().AddRegion(std::move(null_region));
+  } catch (...) {
+    threw_null = true;
+  }
+  assert(threw_null);
+
   brain::communication::DialogBrain brain;
-  assert(brain.MemorySize() >= 2);
+  const std::size_t before_memory = brain.MemorySize();
+  assert(before_memory >= 2);
 
   const bool learned = brain.Teach("hi there => hello human");
   assert(learned);
 
-  const std::string reply = brain.Reply("hi there");
+  const std::string reply = brain.Reply("hi there", "focus");
   assert(reply == "hello human");
 
-  const std::string fallback = brain.Reply("completely new phrase");
+  const std::string fallback = brain.Reply("completely new phrase", "explore");
   assert(!fallback.empty());
+  assert(brain.MemorySize() == before_memory + 1);
 
   return 0;
 }
